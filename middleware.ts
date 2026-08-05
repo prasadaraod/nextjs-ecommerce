@@ -6,7 +6,7 @@ import { verifyJWT } from '@/lib/auth';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith('/dashboard')) {
+  if (pathname.startsWith('/dashboard') || pathname.startsWith('/checkout')) {
     const token = request.cookies.get('token')?.value;
 
     if (!token) {
@@ -26,5 +26,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard', '/dashboard/:path*'],
+  matcher: ['/dashboard', '/dashboard/:path*', '/checkout', '/checkout/:path*'],
 };
