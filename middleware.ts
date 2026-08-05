@@ -6,7 +6,6 @@ import { verifyJWT } from '@/lib/auth';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Protect /dashboard and nested routes
   if (pathname.startsWith('/dashboard')) {
     const token = request.cookies.get('token')?.value;
 
@@ -27,5 +26,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/dashboard', '/dashboard/:path*'],
 };

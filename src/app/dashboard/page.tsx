@@ -1,20 +1,41 @@
 // src/app/dashboard/page.tsx
 'use client';
-
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
 import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
-  const user = useAppSelector((state) => state.auth.user);
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const router = useRouter();
 
+  // Client-side fallback guard if router cache is hit
+  useEffect(() => {
+    if (!isAuthenticated && !user) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, user, router]);
+
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    dispatch(logout());
-    router.push('/login');
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (err) {
+      console.error('Logout error', err);
+    } finally {
+      dispatch(logout());
+      // Performing a hard location change purges Next.js Client Router Cache
+      window.location.href = '/login';
+    }
   };
+
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="container mx-auto p-12 text-center">
+        <p className="text-muted-foreground">Redirecting to login...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-12">
