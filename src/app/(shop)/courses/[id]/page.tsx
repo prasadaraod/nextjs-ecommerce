@@ -14,8 +14,14 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function ProductDetailPage({ params }: { params: { id: string } }) {
-  const product = await getProductById(params.id);
+interface PageProps {
+  params: { id: string };
+}
+
+export default async function ProductDetailPage({ params }: PageProps) {
+  // Await params if using Next.js 14/15 async params pattern
+  const { id } = await params;
+  const product = await getProductById(id);
 
   if (!product) {
     notFound();
@@ -24,7 +30,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
   return (
     <div className="container mx-auto max-w-5xl px-4 py-12">
       <div className="grid gap-8 md:grid-cols-2">
-        <div className="overflow-hidden rounded-xl border bg-muted">
+        <div className="overflow-hidden rounded-xl border bg-muted h-[320px]">
           <img
             src={product.imageUrl}
             alt={product.title}
