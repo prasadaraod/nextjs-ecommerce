@@ -1,6 +1,7 @@
 // src/lib/products.ts
 import { Product } from './types';
 
+// Extend mock products array for testing filters
 export const MOCK_PRODUCTS: Product[] = [
   {
     id: 'nextjs-mastery',
@@ -32,6 +33,16 @@ export const MOCK_PRODUCTS: Product[] = [
     imageUrl: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60',
     updatedAt: new Date().toISOString(),
   },
+  {
+    id: 'node-microservices',
+    title: 'Node.js Microservices with Docker & Kubernetes',
+    description: 'Build scalable backend services, event-driven architectures, and deployment pipelines.',
+    price: 54.99,
+    category: 'Backend',
+    rating: 4.9,
+    imageUrl: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&auto=format&fit=crop&q=60',
+    updatedAt: new Date().toISOString(),
+  }
 ];
 
 export async function getProducts(): Promise<Product[]> {
@@ -40,4 +51,27 @@ export async function getProducts(): Promise<Product[]> {
 
 export async function getProductById(id: string): Promise<Product | undefined> {
   return MOCK_PRODUCTS.find((p) => p.id === id);
+}
+
+// Server-Side Search and Filter Helper
+export async function getFilteredProducts(query?: string, category?: string): Promise<Product[]> {
+  let products = [...MOCK_PRODUCTS];
+
+  if (category && category !== 'all') {
+    products = products.filter(
+      (p) => p.category.toLowerCase() === category.toLowerCase()
+    );
+  }
+
+  if (query) {
+    const q = query.toLowerCase();
+    products = products.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q)
+    );
+  }
+
+  return products;
 }
