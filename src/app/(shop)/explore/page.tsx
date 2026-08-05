@@ -3,19 +3,25 @@ import { getFilteredProducts } from '@/lib/products';
 import ProductCard from '@/components/ui/ProductCard';
 import FilterControls from '@/components/ui/FilterControls';
 
-// Force dynamic server-side rendering for URL search params
+// Force dynamic server-side rendering on every request
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface ExplorePageProps {
-  searchParams: {
+  searchParams: Promise<{
+    q?: string;
+    category?: string;
+  }> | {
     q?: string;
     category?: string;
   };
 }
 
 export default async function ExplorePage({ searchParams }: ExplorePageProps) {
-  const query = searchParams.q || '';
-  const category = searchParams.category || '';
+  // Await searchParams to support Next.js async page props
+  const resolvedParams = await searchParams;
+  const query = resolvedParams?.q || '';
+  const category = resolvedParams?.category || '';
 
   const products = await getFilteredProducts(query, category);
 
@@ -24,7 +30,7 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Explore Catalog</h1>
         <p className="text-muted-foreground text-sm">
-          Server-Side Rendered (SSR) search and filtering powered by URL parameters.
+          Server-Side Rendered (SSR) search and filtering powered by real-time URL parameters.
         </p>
       </div>
 

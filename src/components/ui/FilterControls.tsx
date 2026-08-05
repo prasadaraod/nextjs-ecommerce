@@ -17,22 +17,22 @@ export default function FilterControls() {
   const [search, setSearch] = useState(currentQuery);
 
   const updateFilters = (newQuery: string, newCategory: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams();
 
-    if (newQuery) {
-      params.set('q', newQuery);
-    } else {
-      params.delete('q');
+    if (newQuery.trim() !== '') {
+      params.set('q', newQuery.trim());
     }
 
     if (newCategory && newCategory !== 'all') {
       params.set('category', newCategory);
-    } else {
-      params.delete('category');
     }
 
+    const queryString = params.toString();
+    const newUrl = queryString ? `/explore?${queryString}` : '/explore';
+
     startTransition(() => {
-      router.push(`/explore?${params.toString()}`);
+      router.push(newUrl);
+      router.refresh(); // Forces Next.js server component re-fetch
     });
   };
 
@@ -69,7 +69,7 @@ export default function FilterControls() {
         ))}
       </div>
 
-      {isPending && <p className="text-xs text-primary animate-pulse">Filtering catalog...</p>}
+      {isPending && <p className="text-xs text-primary animate-pulse">Updating catalog...</p>}
     </div>
   );
 }
